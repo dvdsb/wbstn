@@ -1,0 +1,35 @@
+baseurl: "/"
+languageCode: "en-us"
+title: "A minimal Hugo website"
+theme: "hugo-xmin"
+googleAnalytics: ""
+disqusShortname: ""
+ignoreFiles: ["\\.Rmd$", "\\.Rmarkdown$", "_cache$", "\\.knit\\.md$", "\\.utf8\\.md$"]
+footnotereturnlinkcontents: "↩"
+
+permalinks:
+  post: "/post/:year/:month/:day/:slug/"
+
+menu:
+  main:
+    - name: Home
+      url: ""
+      weight: 1
+    - name: Brief CV
+      url: "cv/"
+      weight: 2
+    - name: Posts
+      url: "post/"
+      weight: 3
+    - name: Statistical consultancy
+      url: "statistical_consultancy/"
+      weight: 4
+
+params:
+  description: "A website built through Hugo and blogdown."
+  footer: "&copy; David Bock | [Github](https://github.com/dvdsb) | [Twitter](https://twitter.com/DavidBo28287340) | [LinkedIn](https://www.linkedin.com/in/david-bock-41a41b8/)"
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true

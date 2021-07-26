@@ -1,0 +1,8 @@
+---
+author:
+title: Blog posts
+---
+
+permalinks:
+  post: "/post/:year/:month/:day/:slug/"
+

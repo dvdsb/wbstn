@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Posts on A minimal Hugo website</title>
+    <link>/post/</link>
+    <description>Recent content in Posts on A minimal Hugo website</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 25 Jul 2021 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Bayesian analysis of a very simple example</title>
+      <link>/post/2021/07/25/bayesian-analysis-of-a-very-simple-example/</link>
+      <pubDate>Sun, 25 Jul 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/post/2021/07/25/bayesian-analysis-of-a-very-simple-example/</guid>
+      <description>IntroductionIn this post I´ll explore some basic approaches to analyze a simple simulated data example.
+Two sample continuous outcomeConsider a dependent variable Y and an independent variable X (two levels, A and B).Standardize Y to get zero mean and unit standard deviation.
+DAT &amp;lt;- tibble(N = 60 , X = rbinom(N, 1, 0.5),Y = 0.5*X + rnorm(N)) %&amp;gt;% mutate(X = factor(X, labels = c(&amp;quot;A&amp;quot;, &amp;quot;B&amp;quot;)) , Y = (Y-mean(Y, na.</description>
+    </item>
+    
+  </channel>
+</rss>

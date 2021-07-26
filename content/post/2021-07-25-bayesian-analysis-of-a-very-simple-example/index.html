@@ -1,0 +1,194 @@
+---
+title: "Bayesian analysis of a very simple example"
+author: ''
+date: '2021-07-25'
+slug: bayesian-analysis-of-a-very-simple-example
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
+<div id="introduction" class="section level2">
+<h2>Introduction</h2>
+<p>In this post I´ll explore some basic approaches to analyze a simple simulated data example.</p>
+</div>
+<div id="two-sample-continuous-outcome" class="section level2">
+<h2>Two sample continuous outcome</h2>
+<p>Consider a dependent variable Y and an independent variable X (two levels, A and B).
+Standardize Y to get zero mean and unit standard deviation.</p>
+<pre class="r"><code>DAT &lt;- tibble(N = 60 , 
+              X = rbinom(N, 1, 0.5),
+              Y =  0.5*X + rnorm(N)) %&gt;% 
+        mutate(X = factor(X, labels = c(&quot;A&quot;, &quot;B&quot;)) , 
+               Y = (Y-mean(Y, na.rm=T))/sd(Y, na.rm=T))</code></pre>
+<p>Describe the data (recall that Y has been standardized)</p>
+<pre class="r"><code>DESC &lt;- DAT %&gt;%   group_by(X) %&gt;%
+  summarise( mean = mean(Y, na.rm=T) ,
+             sd = sd(Y, na.rm=T) ,
+             min=min(Y, na.rm=T),
+             max=max(Y, na.rm=T) ,
+             n = n()) %&gt;%
+  knitr::kable(digits = 2)
+DESC</code></pre>
+<table>
+<thead>
+<tr class="header">
+<th align="left">X</th>
+<th align="right">mean</th>
+<th align="right">sd</th>
+<th align="right">min</th>
+<th align="right">max</th>
+<th align="right">n</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="left">A</td>
+<td align="right">-0.37</td>
+<td align="right">0.93</td>
+<td align="right">-2.35</td>
+<td align="right">1.36</td>
+<td align="right">19</td>
+</tr>
+<tr class="even">
+<td align="left">B</td>
+<td align="right">0.17</td>
+<td align="right">0.99</td>
+<td align="right">-1.22</td>
+<td align="right">2.67</td>
+<td align="right">41</td>
+</tr>
+</tbody>
+</table>
+<p>Plot the data</p>
+<pre class="r"><code>PLT_1 &lt;- DAT %&gt;%          ggplot(  aes(x=Y, color=X , fill=X )) +
+  #   geom_histogram(aes(y=..density..), position=&quot;identity&quot;, alpha=0.2 , binwidth= 0.333)+
+  geom_density(alpha=0.2)+
+  scale_color_manual(values=c(&quot;red&quot;, &quot;blue&quot;))+
+  scale_fill_manual(values=c(&quot;red&quot;, &quot;blue&quot;))+
+  labs(x=&quot;Y&quot;, y = &quot;Density&quot;)+
+  theme_classic() +
+  geom_rug() +
+  theme(legend.text = element_text(size = 12, colour = &quot;black&quot;, angle = 0)) +
+  theme(legend.position = c(0.8, 0.8)) +
+  theme(axis.text.x = element_text(size=12), axis.text.y = element_text(size=12))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+</div>
+<div id="frequentist-inference-by-a-standard-linear-model-two-sample-t-test" class="section level2">
+<h2>Frequentist inference by a standard linear model (two-sample t-test):</h2>
+<pre class="r"><code>m1 &lt;- broom::tidy(lm(Y~X , data = DAT), conf.int = T,  conf.level = 0.95)[2,]
+M &lt;- signif(as.numeric(m1[, 2]) , digits = 2) ; 
+L&lt;- signif(as.numeric(m1[, 6]) , digits = 2) ; 
+U &lt;- signif(as.numeric(m1[, 7]), digits = 2) ; 
+UU_ &lt;- paste( U,&quot;(95%CI:&quot;,L, &quot;;&quot;,U, &quot;)&quot;)</code></pre>
+<p>Mean difference and 95% compatibility intervals:</p>
+<pre><code>[1] &quot;1.1 (95%CI: 0.0036 ; 1.1 )&quot;</code></pre>
+</div>
+<div id="bayesian-inference" class="section level2">
+<h2>Bayesian inference:</h2>
+<p>Let us use the <a href="https://cran.r-project.org/web/packages/brms/index.html"><em>brms</em> package</a>.
+Use default priors (what is a <em>default</em> prior?)</p>
+<pre class="r"><code>library(brms)</code></pre>
+<pre class="r"><code>m13 &lt;- brms::brm(Y ~ X, data = DAT, 
+             family = gaussian,
+           iter = 4000, warmup = 1000, chains = 4, seed = 12 , cores = 1)</code></pre>
+<p>Look what was the <em>default</em> priors:</p>
+<pre class="r"><code>prior_summary(m13)</code></pre>
+<pre><code>##                    prior     class coef group resp dpar nlpar bound
+##                   (flat)         b                                 
+##                   (flat)         b   XB                            
+##  student_t(3, -0.2, 2.5) Intercept                                 
+##     student_t(3, 0, 2.5)     sigma                                 
+##        source
+##       default
+##  (vectorized)
+##       default
+##       default</code></pre>
+<p>Try another types of priors:</p>
+<pre class="r"><code>get_prior(Y ~ X, data = DAT)
+
+priors2 &lt;- c(set_prior(&quot;normal(0, 1)&quot;, class = &quot;Intercept&quot;),
+             set_prior(&quot;normal(0, 1)&quot;, class = &quot;b&quot;, coef = &quot;XB&quot;),
+             set_prior(&quot;exponential(1)&quot;, class = &quot;sigma&quot;))
+
+m14 &lt;- brm(formula = Y ~ X, 
+             data    = DAT,
+             seed    = 123, 
+              prior = priors2)</code></pre>
+<p>Did they model actually use the priors I specified?</p>
+<pre class="r"><code>prior_summary(m14)</code></pre>
+<pre><code>##           prior     class coef group resp dpar nlpar bound  source
+##          (flat)         b                                  default
+##    normal(0, 1)         b   XB                                user
+##    normal(0, 1) Intercept                                     user
+##  exponential(1)     sigma                                     user</code></pre>
+<pre class="r"><code>resA &lt;- fixef(m13)
+resB &lt;- fixef(m14)[2,]
+M2 &lt;- signif(as.numeric(fixef(m14)[2, 1]) , digits = 2) ; 
+L2&lt;- signif(as.numeric(fixef(m14)[2, 3]) , digits = 2) ; 
+U2 &lt;- signif(as.numeric(fixef(m14)[2, 4]), digits = 2) ;
+U_2 &lt;- paste( M2,&quot;(95%CI:&quot;,L2, &quot;;&quot;,U2, &quot;)&quot;)</code></pre>
+<p>So using the same priors, we now get:</p>
+<pre class="r"><code>U_2</code></pre>
+<pre><code>## [1] &quot;0.51 (95%CI: 0.0037 ; 1 )&quot;</code></pre>
+<p>Lets say I have a strong prior belief that the mean difference between A and B is close to one.
+Let the prior reflect this belief and then estimate the model.</p>
+<pre class="r"><code>priors3 &lt;- c(set_prior(&quot;normal(0, 1)&quot;, class = &quot;Intercept&quot;),
+             set_prior(&quot;normal(1, 0.25)&quot;, class = &quot;b&quot;, coef = &quot;XB&quot;),
+             set_prior(&quot;exponential(1)&quot;, class = &quot;sigma&quot;))
+m15 &lt;- brm(formula = Y ~ X, 
+             data    = DAT,
+             seed    = 123, 
+              prior = priors3)</code></pre>
+<p>Plotting the posterior distribution using the <a href="http://mjskay.github.io/tidybayes/index.html/"><em>tidybayes</em></a> package</p>
+<pre class="r"><code>PPP &lt;- posterior_samples(m15) %&gt;%
+  ggplot(aes(x = b_XB , y = 0)) +
+  stat_halfeye(fill = &quot;orange2&quot;, .width = .95) +
+  scale_y_continuous(NULL, breaks = NULL) +
+  theme_fivethirtyeight() +
+  theme(axis.text.x = element_text( size = 15))</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
+<p>Extract the posterior distributions from the three models (default priors, mean zero prior and mean one prior).
+I took the code below from <a href="https://www.rensvandeschoot.com/tutorials/r-linear-regression-bayesian-using-brms/"><em>here</em></a>.</p>
+<pre class="r"><code>set.seed(535)
+
+posterior1.2.3 &lt;- bind_rows(&quot;Default priors&quot; = as_tibble(posterior_samples(m13)$b_XB ),
+                            &quot;Mean Zero prior&quot; = as_tibble(posterior_samples(m14)$b_XB ),
+                            &quot;Mean one prior&quot; = as_tibble(posterior_samples(m15)$b_XB ),
+                            .id = &quot;id1&quot;)    %&gt;%
+            rename(b_XB = value)
+
+
+prior1.2.3 &lt;- bind_rows(&quot;Default priors&quot; = enframe(runif(10000, min = -2.1, max = 2.1)),
+                            &quot;Mean Zero prior&quot; = enframe(rnorm(10000, mean=0, sd=1)),
+                            &quot;Mean one prior&quot; = enframe(rnorm(10000, mean=1, sd=0.25)),
+                              .id = &quot;id1&quot;) %&gt;%
+                               rename(b_XB = value)
+
+priors.posterior &lt;- bind_rows(&quot;posterior&quot; = posterior1.2.3, &quot;prior&quot; = prior1.2.3, .id = &quot;id2&quot;)</code></pre>
+<p>Plot the data. Dotted lines are priors and solid lines are posterior. Default flat (“improper”, that is a prior that is does not fulfill the requirements of a probability distribution) prior and Mean zero prior give very similar posterior. For the mean one prior you see that the posterior is in between the mean of one and the frequentist estimate of 0.53.</p>
+<pre class="r"><code>PLT_3 &lt;- ggplot(data    = priors.posterior, 
+       mapping = aes(x        = b_XB, 
+                     fill     = id1, 
+                     colour   = id2, 
+                     linetype = id2,
+                     alpha    = id2)) +
+  geom_density(size=1)  +
+  scale_x_continuous(limits=c(-2.5, 2.5)) +
+  scale_colour_manual(name   = &#39;Posterior/Prior&#39;, 
+                      values = c(&quot;black&quot;,&quot;red&quot;), 
+                      labels = c(&quot;posterior&quot;, &quot;prior&quot;)) +
+  scale_linetype_manual(name   = &#39;Posterior/Prior&#39;,
+                        values = c(&quot;solid&quot;,&quot;dotted&quot;),
+                        labels = c(&quot;posterior&quot;, &quot;prior&quot;)) +
+  scale_alpha_discrete(name   =&#39;Posterior/Prior&#39;,
+                       range  = c(.7,.3),
+                       labels = c(&quot;posterior&quot;, &quot;prior&quot;)) +
+  scale_fill_manual(name   = &quot;Densities&quot;,
+                    values = c(&quot;darkred&quot;,&quot;blue&quot;, &quot;green&quot; )) +
+  labs(title    = expression(&quot;Influence of (Informative) Priors on&quot; ~ beta[X]), 
+       subtitle = &quot;3 different densities of priors and posteriors&quot;)
+
+PLT_3</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/S%20-1.png" width="672" /></p>
+</div>

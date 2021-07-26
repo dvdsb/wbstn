@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Home on A minimal Hugo website</title>
+    <link>/</link>
+    <description>Recent content in Home on A minimal Hugo website</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en-us</language>
+    <lastBuildDate>Sun, 25 Jul 2021 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Bayesian analysis of a very simple example</title>
+      <link>/post/2021/07/25/bayesian-analysis-of-a-very-simple-example/</link>
+      <pubDate>Sun, 25 Jul 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/post/2021/07/25/bayesian-analysis-of-a-very-simple-example/</guid>
+      <description>IntroductionIn this post I´ll explore some basic approaches to analyze a simple simulated data example.
+Two sample continuous outcomeConsider a dependent variable Y and an independent variable X (two levels, A and B).Standardize Y to get zero mean and unit standard deviation.
+DAT &amp;lt;- tibble(N = 60 , X = rbinom(N, 1, 0.5),Y = 0.5*X + rnorm(N)) %&amp;gt;% mutate(X = factor(X, labels = c(&amp;quot;A&amp;quot;, &amp;quot;B&amp;quot;)) , Y = (Y-mean(Y, na.</description>
+    </item>
+    
+    <item>
+      <title>About Hugo XMin</title>
+      <link>/about/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/about/</guid>
+      <description>XMin is the . The original reason that I wrote it was I needed a minimal example of Hugo themes when I was writing the blogdown book. Basically I wanted a simple theme that supports a navigation menu, a home page, other single pages, lists of pages, blog posts, categories, tags, and RSS. That is all. Nothing fancy. In terms of CSS and JavaScript, I really want to keep them minimal.</description>
+    </item>
+    
+    <item>
+      <title>Blog posts</title>
+      <link>/post/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/post/</guid>
+      <description>Posts Bayesian analysis of a very simple example</description>
+    </item>
+    
+    <item>
+      <title>Brief CV</title>
+      <link>/cv/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/cv/</guid>
+      <description>full CV available upon request
+PERSONAL DATA Name: David Bock Year of birth: 1976 Office address:
+ Biostatistics, School of Public Health and Community Medicine, Institute of Medicine, Göteborg University, Göteborg University, Sweden SSORG, Sahlgrenska University Hospital/Östra, Sweden  Email: david.bock@gu.se (work) Email: davidbock76@gmail.com (personal/consulting)
+CURRENT POSITIONS  11/2019 - : Senior lecturer, School of Public Health and Community Medicine, Institute of Medicine, Göteborg University 8/2014 - : Researcher, Scandinavian Surgical Outcome Research Group (SSORG), Institute of Clinical Sciences, Göteborg University 8/2019 - : Biostatistical consultant (freelance part time)  PREVIOUS POSITIONS  8/2014 –11/2019: Researcher, Department of Public Health and Community Medicine, Sahlgrenska Academy, Göteborg University 3/2006 – 8/2014: Statistician, AstraZeneca R&amp;amp;D Mölndal, Sweden  ACADEMIC DEGREES  2/2019: Associate professor (epidemiology), Sahlgrenska Academy, Göteborg University 1/2005: Ph.</description>
+    </item>
+    
+    <item>
+      <title>Statistical consultancy</title>
+      <link>/statistical_consultancy/</link>
+      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
+      
+      <guid>/statistical_consultancy/</guid>
+      <description>I have a broad experience ranging from pharmaceutical drug development to design and analysis of epidemiological studies and prediction models.
+I undertake statistical consulting assignments. For example:
+ Courses/workshops/teaching Study design &amp;ndash;	Sample size calculation &amp;ndash;	Study protocol input &amp;ndash;	Probability of success Statistical Analysis Plan Research manuscript input Data monitoring committee Prediction models Bayesian analysis Go/No Go criteria  If interested, please contact me at: davidbock76@gmail.com
+Testimonials are available.</description>
+    </item>
+    
+  </channel>
+</rss>
