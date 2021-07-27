@@ -1,0 +1,202 @@
+---
+title: Predicting the probability of rejecting H0 before running the study
+author: dvdsb
+date: '2021-07-27'
+slug: predicting-the-probability-of-rejecting-h0-before-running-the-study
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>This is the first of three posts that address:<br />
+1. Predicting the probability of a “positive” (reject <span class="math inline">\(H_{0}\)</span>) study <em>before</em> running the study<br />
+2. Interim analyses <em>during</em> the study<br />
+3. Evaluating study data in a meaningful way <em>after</em> the study is completed.</p>
+<p>Topic 2. and 3. will be posted later.</p>
+</div>
+<div id="the-general-linear-model" class="section level1">
+<h1>The general linear model</h1>
+<p>Consider the general linear model with a single factor (One-way ANOVA) for a mean centered variable <span class="math inline">\(Y_{ij}\)</span>, <span class="math inline">\(Y_{ij}=Z_{ij}-\overline{Z}\)</span>:</p>
+<p><span class="math display">\[\begin{align*} Y_{ij} =\tau_{j}+\epsilon_{ij}\\ 
+\end{align*}\]</span>
+where <span class="math inline">\(\sum\tau=0\)</span>. <span class="math inline">\(\epsilon_{ij}\sim{\sf N}(0, \sigma)\)</span> and <span class="math inline">\(\sum\tau=0\)</span>. Can be expressed as <span class="math inline">\(Y_{i}\sim{\sf N}(\tau_{i}, \sigma)\)</span>.Consider the situation with two levels, j=1, 2, where the aim is to estimate <span class="math inline">\(\theta=\tau_{2}-\tau_{1}\)</span>. One Baysian model of Y is</p>
+<p><span class="math display">\[\begin{align*}  Y_{i}\sim{\sf N}(\tau_{i}, \sigma_{Y})
+\end{align*}\]</span>
+<span class="math display">\[\begin{align*}  \tau_{i}\sim{\sf N}(\gamma_{i}, \sigma_{\tau})
+\end{align*}\]</span>
+<span class="math display">\[\begin{align*}  \sigma^{-2} &amp;\sim {\sf Inv-\chi^2}(\nu_{0}, \sigma^2_{0})
+\end{align*}\]</span></p>
+<p>For a completely randomized design the estimator <span class="math inline">\(\overline{x}_{1} - \overline{x}_{2}\)</span> of <span class="math inline">\(\theta\)</span> has the property<br />
+<span class="math display">\[\begin{align*} \overline{x}_{1} - \overline{x}_{2} &amp;\sim {\sf N}(\theta,\sqrt{\frac{2\sigma^2}{n}} )  
+\end{align*}\]</span>
+where <span class="math inline">\(n\)</span> is the number of observations for each factor level 1 and 2.</p>
+</div>
+<div id="study-design" class="section level1">
+<h1>Study design</h1>
+<div id="frequentist-sample-size-calculation" class="section level2">
+<h2>Frequentist sample size calculation</h2>
+<p>In order to make an an assertion that <span class="math inline">\(\theta\)</span><span class="math inline">\(&gt;0 (\)</span><span class="math inline">\(H_{1})\)</span>, if <span class="math inline">\(\alpha\)</span> =2.5%, <span class="math inline">\(\sigma\)</span>=2 and we require 80% power to declare statistical significance (make an “assertion of efficacy”, to quote Frank Harrell, watch it <a href="https://youtu.be/1liOEyeDRbU">here</a>) if the true value of <span class="math inline">\(\theta\)</span> = 1, then 63 evaluable subjects/group are needed. The (frequentist) probability conditional on <span class="math inline">\(\theta\)</span> = 1 of rejecting <span class="math inline">\(H_{0}\)</span>, <span class="math inline">\(P(\text{reject } H_{0}| \theta=1)\)</span> is then 0.80. To achieve <span class="math inline">\(P(\text{reject } H_{0}| \theta=1)\)</span>=0.90, 84 subjects/group are needed.</p>
+</div>
+</div>
+<div id="probability-of-success-of-future-study" class="section level1">
+<h1>Probability of success of future study</h1>
+<div id="semi-bayesian-probability-of-success-assertion-of-efficacyassurance" class="section level2">
+<h2>Semi-bayesian probability of success (<em>“assertion of efficacy”/Assurance</em>)</h2>
+<p>Lets say (<em>Gelman, et al</em>)</p>
+<p><span class="math display">\[\begin{align*} \theta|\sigma^2 &amp;\sim {\sf N}(\theta_{0}, \tau^2_{0}) 
+\end{align*}\]</span></p>
+<p><span class="math display">\[\begin{align*} \sigma^2 &amp;\sim {\sf Inv-\chi^2}(\nu_{0}, \sigma^2_{0})
+\end{align*}\]</span></p>
+<p>The hyperparameters <span class="math inline">\(\theta_{0}\)</span>, <span class="math inline">\(\tau_{0}\)</span>, <span class="math inline">\(\nu_{0}\)</span>, <span class="math inline">\(\sigma_{0}\)</span> are determined by information from a previous study. Let say the previous study had n=50/group, <span class="math inline">\(\overline{x}_{1} - \overline{x}_{2}\)</span> = 0.5 and <span class="math inline">\(\hat{\sigma}\)</span> = 2 for both groups. Then we can calculate the <em>unconditional</em> probability of rejecting <span class="math inline">\(H_{0}\)</span>.</p>
+<p><span class="math display">\[\begin{align*} P(\text{reject }H_{0})= \int_{\theta, \sigma}{P(\text{reject }H_{0}| \theta, \sigma^2)\cdot P(\theta, \sigma^2)d\theta\sigma}
+\end{align*}\]</span></p>
+<p>This is the approach referred to as <em>Assurance</em> proposed by <a href="http://hbiostat.org/papers/studyDesign/sampleSize/bayes/spi86pre.pdf">Spiegelhalter &amp; Freedman</a> and developed by <a href="https://onlinelibrary.wiley.com/doi/pdf/10.1002/pst.175">O´Hagan</a>. The R package <a href="https://rdrr.io/github/scientific-computing-solutions/assurance/">here</a> was used for calculations:</p>
+<pre class="r"><code>library(assurance)
+initial.data &lt;- new.gaussian(delta.mu=0.5, sd1=2, sd2=2, m1=50, m2=50)
+later.study &lt;- new.twoArm(size=study.size(grp1.size=63, grp2.size=63),significance=0.05)
+Assurance &lt;- round(100*assurance(initial.data, later.study, 100000))</code></pre>
+<p>Given the results from the previous study, <span class="math inline">\(P(\text{reject }H_{0})\)</span>=35%. Given everything else equal, if the previous study had an observed effect of <em>1</em> instead of <em>0.5</em>, then <span class="math inline">\(P(\text{reject }H_{0})\)</span>=70%. How does the probability of success depend on the sample sizes from the previous and forthcoming study? How does the previously estimated effect influence? Given <span class="math inline">\(\hat{\sigma}\)</span> = 2, we see that the larger the sample size of the previous study, the less will the assurance be in the in-between uncertain region around 50%. If the previously estimated effect is small (left panel) the assurance will decrease with study size.</p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-5-1.png" width="576" /></p>
+<p>Assurance will increase if the previous estimate indicate a larger effect. For a future study with 63 subjects/group a previous estimated effect of 1 based on a enormous study (&gt;1000 subjects) the assurance will be 80% (the power). With 84 subjects assurance will be 90%. With a previous estimate of 0 assurance will tend to 2.5%.</p>
+</div>
+<div id="hmisc-function-gbayes2" class="section level2">
+<h2>Hmisc function <em>gbayes2</em></h2>
+<p><a href="https://www.rdocumentation.org/packages/Hmisc/versions/4.3-1/topics/gbayes"><em>gbayes2</em></a> also refer to <a href="http://hbiostat.org/papers/studyDesign/sampleSize/bayes/spi86pre.pdf">Spiegelhalter and Freedman (1986)</a> to compute the probability of correctly concluding that a new treatment is superior to a control. In the Hmisc manual it says <em>“Even though gbayes2 assumes that the test statistic has a normal distribution with known variance (which is strongly a function of the sample size in the two treatment groups), the prior distribution function can be completely general.”</em>. I interpret that the scale parameter <span class="math inline">\(\sigma\)</span> of the likelihood has a prior with a spike at the value of anticipated standard error of the planned study, i.e. a constant. But this is in practice no limitation because the scale is a nuisance parameter and prior information of <span class="math inline">\(\theta\)</span> is only what interests us. I think the reason why we can still get closed form solutions without a conjugate prior distribution (we don´t estimate a posterior distribution here, though) is because is fixed <span class="math inline">\(\sigma\)</span> (for the same reason <em>Assurance</em> relies on simulations) <em>Assurance</em>, is in principle <em>gbayes2</em> but where the source of the prior belief (the previous study) is explicitly included, but this is of course not needed.</p>
+<p>Again, given the previous study with n=50/group, <span class="math inline">\(\overline{x}_{1} - \overline{x}_{2}\)</span> = 0.5 and <span class="math inline">\(\hat{\sigma}\)</span> = 2. If we let</p>
+<p><span class="math display">\[\begin{align*} \tau|n, \sigma = \sqrt{\frac{2\sigma^2}{n}}= \sqrt{\frac{2\cdot 2^2}{50}}=0.40 
+\end{align*}\]</span></p>
+<pre class="r"><code>library(Hmisc)
+N&lt;- 63
+SD &lt;- 2
+SE &lt;- sqrt(2/N)*SD;
+
+prior0 &lt;- function(delta)dnorm(delta, 0.5, sqrt(2/50)*2)
+gb0&lt;-round(100*gbayes2(sd = SE, prior = prior0, delta.w=0, alpha=0.05, upper=Inf))
+
+prior1 &lt;- function(delta)dnorm(delta, 1, sqrt(2/50)*2)
+gb1&lt;-round(100*gbayes2(sd = SE, prior = prior1, delta.w=0, alpha=0.05, upper=Inf)) 
+
+prior1 &lt;- function(delta)dnorm(delta, 1, 0.005)
+gb2&lt;-round(100*gbayes2(sd = SE, prior = prior1, delta.w=0, alpha=0.05, upper=Inf)) </code></pre>
+<p>Then the probability to achieve a statically significant result in the planned study is 35. If the previous estimated effect was instead <em>1</em> then we get 71%. Hence, we get the same results as in the calculates above. Similarly, if the previous study was gigantic, the prior uncertainty is minimal and the probability of success will be equal to the power of the study. Previous setting have had a rather informative prior reflected belief with high certainty as reflected by a small value of the hyperparameter <span class="math inline">\(\tau\)</span>=0.40. We can allow for more uncertainty by using a vague prior with large value of <span class="math inline">\(\tau\)</span>, say 10.</p>
+<pre class="r"><code>N&lt;- 63
+SD &lt;- 2
+SE &lt;- sqrt(2/N)*SD;
+prior0 &lt;- function(delta)dnorm(delta, 0.5, 10)
+gb3&lt;-round(100*gbayes2(sd = SE, prior = prior0, delta.w=0, alpha=0.05, upper=Inf))</code></pre>
+<p>Then we get 49% which is higher than 35% because we now get more of the distribution in the right tail that favor a rejection of <span class="math inline">\(H_{0}\)</span>.</p>
+</div>
+<div id="simulating-future-studies-based-on-prior-predictive-distribution" class="section level2">
+<h2>Simulating future studies based on prior predictive distribution</h2>
+<p>The calculations above combines Bayesian and frequentist philosophies. Since no data is being used (the previous study is just a metaphor for prior belief, it doesn´t matter how we got the information) and no posterior distribution is calculated. An alternative way is to make predictions from the prior distribution and evaluate the operating characteristics of these. This is called the prior predictive distribution.</p>
+<p><span class="math display">\[\begin{align*} f(Y)= \int_{\theta, \sigma}{f(Y| \theta, \sigma^2)\cdot P(\theta, \sigma^2)d\theta\sigma}
+\end{align*}\]</span></p>
+<p>Lets say</p>
+<p><span class="math display">\[\begin{align*} Y &amp;\sim {\sf N}(\theta_{0}, \tau^2_{0}) 
+\end{align*}\]</span>
+<span class="math display">\[\begin{align*} \theta_{0} &amp;\sim {\sf N}([0, 0.5], 1) 
+\end{align*}\]</span>
+<span class="math display">\[\begin{align*} \tau_{0} &amp;\sim {\sf half-t}(3, 0.5, 2.5) 
+\end{align*}\]</span></p>
+<p>The prior mean value of <span class="math inline">\(\theta_{0}\)</span> is hence 0 and 0.5 for group <em>A</em> and <em>B</em>, respectively. We also evaluate for the prior <span class="math inline">\(\theta_{0}\sim{\sf N}([0, 1.0], 1)\)</span> that is a mean difference of 1.0. The prior for <span class="math inline">\(\sigma\)</span> is the default prior in the <strong>BRMS</strong> package.</p>
+<p>By combining these prior distributions we can simulate data that is predictions of observations in future studies.</p>
+<pre class="r"><code>gc()
+library(brms)
+library(tidybayes)
+library(tidymodels)
+
+# Create dummy data for use when making the predictions from the prior
+Empty &lt;- tibble(Y = c(0, 0) , X = factor(c(0, 1), labels = c(&quot;A&quot;, &quot;B&quot;)))
+
+# Two scenarios: prior mu = 0.5 and 0.75.
+prior_1 = c( prior(normal(0, 1), class = &quot;b&quot;, coef = &quot;XA&quot;),
+             prior(normal(0.5, 1), class = &quot;b&quot;, coef = &quot;XB&quot;) )  
+prior_2 = c( prior(normal(0, 1), class = &quot;b&quot;, coef = &quot;XA&quot;),
+             prior(normal(1, 1), class = &quot;b&quot;, coef = &quot;XB&quot;) )  
+
+fnc &lt;- function(sz, P_, MU)
+{
+# Specify priors
+prior_ = P_     
+# Set up the model to simulate from
+BPr &lt;-   brms::brm(data = Empty,
+                   family = gaussian,
+                   Y ~  0 + X,
+                   prior = prior_,
+                   sample_prior = TRUE ,
+                   iter = 4000, warmup = 1000, chains = 4, cores = 4,
+                   seed = 12)
+# Make predictions of outcomes in future study based on the prior distribution
+draws_prior &lt;- Empty %&gt;%
+  tidybayes::add_fitted_draws(BPr, n = 10000) %&gt;%
+  mutate( Y  = .value) %&gt;%
+  dplyr::select(Y, X, .draw, .row) 
+
+df &lt;- data.frame(draws_prior)
+# Make repeated (1000 times) samples (i.e. &quot;future studies&quot;) of given size. 
+  df &lt;- data.frame(draws_prior)
+  dfA &lt;- subset(df, X==&quot;A&quot;)
+  dfB &lt;- subset(df, X==&quot;B&quot;)
+  smplA &lt;-  infer::rep_sample_n( dfA, size=sz, replace = T, reps = 1000, prob = NULL)
+  smplB &lt;-  infer::rep_sample_n( dfB, size=sz, replace = T, reps = 1000, prob = NULL)
+  smpl0 &lt;- rbind(smplA, smplB)
+  
+  smpl &lt;- smpl0 %&gt;% 
+    group_by(replicate, X) %&gt;%
+    summarise(Average=mean(Y), SD=sd(Y), n=n()) %&gt;%
+    group_by(replicate) %&gt;%  
+    mutate(Previous = lag(Average), 
+           Mean_diff = Average - Previous, 
+           LCL = Mean_diff - 1.96*sqrt(2/sz)*SD, 
+           Reject=if_else(LCL&lt;0, 0, 1)) %&gt;%
+  filter(X==&quot;B&quot;) %&gt;%
+  mutate(Study.size = paste(&quot;N/group: &quot;, sz, &quot;Prior effect &quot;, MU))
+  
+  LST &lt;- c(draws_prior, smpl)
+   return(LST)
+  
+}
+# Percent of times lower 95% confidence interval is &gt; 0
+PoS1 &lt;- fnc(sz=63, P_ = prior_1, MU=0.5)
+  gc()
+PoS2 &lt;- fnc(sz=63, P_ = prior_2, MU=1.0)
+
+
+PoS1A &lt;- tibble(Y=PoS1$Y, X=PoS1$X)
+PoS1B &lt;- tibble(Mean_diff=PoS1$Mean_diff, Reject=PoS1$Reject, Study.size=PoS1$Study.size)
+PoS2A &lt;- tibble(Y=PoS2$Y, X=PoS2$X)
+PoS2B &lt;- tibble(Mean_diff=PoS2$Mean_diff, Reject=PoS2$Reject, Study.size=PoS2$Study.size)
+
+
+PoS11 &lt;- round(100*(sum(PoS1B$Reject)/1000))
+PoS21 &lt;- round(100*(sum(PoS2B$Reject)/1000))
+PoS&lt;- rbind(PoS1B, PoS2B)
+
+# Plot prior predictive distribution
+fig2 &lt;- ggplot(PoS1A, aes(x=X, y=Y)) + 
+   theme_bw() +
+  geom_violin() + 
+  geom_boxplot(width=0.1) 
+
+# Plot the distribution of the mean differences
+fig3 &lt;- ggplot(PoS, aes(x= Mean_diff, color=Study.size)) +
+  geom_density(aes(linetype=Study.size, color=Study.size), size=2) + 
+  theme_bw() +
+  theme(legend.position=&quot;bottom&quot;)  + 
+  geom_vline(aes(xintercept=0), color=&quot;gray&quot;, linetype=&quot;dashed&quot;, size=1) </code></pre>
+<p>The graph shows the prior predictions for <span class="math inline">\(\theta_{0}\sim{\sf N}([0, 0.5], 1)\)</span>. It is clear that for the current choice of priors data is far from normal - looks more like a double exponential distribution.</p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-9-1.png" width="576" /></p>
+<p>We see that for the prior <span class="math inline">\(\theta_{0}\sim{\sf N}([0, 0.5], 1)\)</span> and a study size of 63 groups, Assurance (percent of times lower 95% CI is &gt; 0) becomes 37%. For <span class="math inline">\(\theta_{0}\sim{\sf N}([0, 1.0], 1)\)</span> it becomes 94%.</p>
+<p>The plot shows the densities for the mean difference <span class="math inline">\((\overline{x}_{1} - \overline{x}_{2})\)</span>.</p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-10-1.png" width="576" /></p>
+<p>The Assurance does not become the same as in the previous calculations. There may be different reasons for this, e.g. how the priors was specified.</p>
+</div>
+</div>
+<div id="concluding-remarks" class="section level1">
+<h1>Concluding remarks</h1>
+<p>The greatness of the Bayesian approach is much more than being transparent about and systematic use prior knowledge. A major advantage of the Bayesian approach (as compared to the frequentist) is that it gives us a posterior distribution that provides relevant answers to our scientific questions. The frequentist point estimate and confidence interval is less informative for us (not to mention the p-value).</p>
+<p>Some may find the choice of priors troublesome. But this problem is minor as compared to the benefits. You can chose whatever prior you like and does not necessarily only need to reflect the outcomes of previous studies. Other reasons for choice of prior is to calibrate the degree of regularization, e.g. by a <em>horseshoe prior</em>. A general advice is to decide on prior before analysing the data in order to ensure a high scientific integrity.</p>
+<p>Simulating data based on prior distributions is a good way to assess the appropriateness of the prior by assessing if it will give rise to realistic data. A normal prior can provide L2-regularization (Ridge regression), see <a href="https://towardsdatascience.com/horseshoe-priors-f97672b4f7cb">here</a>. The variance <span class="math inline">\(\sigma^2_{\tau}\)</span> is the inverse of the degree of regularization. Our specification <span class="math inline">\(\sigma_{\tau}\)</span>=1 is likely to impose too much regularization to be used in practice, but is merely used for illustration. Our use of the traditional definition of a <em>positive</em> study - a p-value&lt;0.05 with a threshold of 0 was also used for illustration.</p>
+</div>

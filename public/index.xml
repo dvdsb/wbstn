@@ -6,7 +6,21 @@
     <description>Recent content in Home on A minimal Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 25 Jul 2021 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 27 Jul 2021 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Predicting the probability of rejecting H0 before running the study</title>
+      <link>/post/2021/07/27/predicting-the-probability-of-rejecting-h0-before-running-the-study/</link>
+      <pubDate>Tue, 27 Jul 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/post/2021/07/27/predicting-the-probability-of-rejecting-h0-before-running-the-study/</guid>
+      <description>IntroductionThis is the first of three posts that address:
+1. Predicting the probability of a “positive” (reject \(H_{0}\)) study before running the study
+2. Interim analyses during the study
+3. Evaluating study data in a meaningful way after the study is completed.
+Topic 2. and 3. will be posted later.
+The general linear modelConsider the general linear model with a single factor (One-way ANOVA) for a mean centered variable \(Y_{ij}\), \(Y_{ij}=Z_{ij}-\overline{Z}\):</description>
+    </item>
+    
     <item>
       <title>Bayesian analysis of a very simple example</title>
       <link>/post/2021/07/25/bayesian-analysis-of-a-very-simple-example/</link>
