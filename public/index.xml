@@ -6,7 +6,30 @@
     <description>Recent content in Home on A minimal Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Tue, 27 Jul 2021 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Thu, 29 Jul 2021 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Blog posts</title>
+      <link>/post/</link>
+      <pubDate>Thu, 29 Jul 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/post/</guid>
+      <description>Posts Interim analysis for early stopping during the study Predicting the probability of rejecting H0 before running the study Bayesian analysis of a very simple example</description>
+    </item>
+    
+    <item>
+      <title>Interim analysis for early stopping during the study</title>
+      <link>/post/2021/07/29/interim-analysis-for-early-stopping-during-the-study/</link>
+      <pubDate>Thu, 29 Jul 2021 00:00:00 +0000</pubDate>
+      
+      <guid>/post/2021/07/29/interim-analysis-for-early-stopping-during-the-study/</guid>
+      <description>IntroductionThis is the second of three posts that address:
+1. Predicting the probability of a “positive” (reject \(H_{0}\)) study before running the study
+2. Interim analyses during the study
+3. Evaluating study data in a meaningful way after the study is completed.
+The first post is available here.
+Interim analyses of an ongoing clinical trial enable early stopping due to efficacy or futility. Clinical trials that involve interims data looks are often referred to as group sequential trials.</description>
+    </item>
+    
     <item>
       <title>Predicting the probability of rejecting H0 before running the study</title>
       <link>/post/2021/07/27/predicting-the-probability-of-rejecting-h0-before-running-the-study/</link>
@@ -39,15 +62,6 @@ DAT &amp;lt;- tibble(N = 60 , X = rbinom(N, 1, 0.5),Y = 0.5*X + rnorm(N)) %&amp
       
       <guid>/about/</guid>
       <description>XMin is the . The original reason that I wrote it was I needed a minimal example of Hugo themes when I was writing the blogdown book. Basically I wanted a simple theme that supports a navigation menu, a home page, other single pages, lists of pages, blog posts, categories, tags, and RSS. That is all. Nothing fancy. In terms of CSS and JavaScript, I really want to keep them minimal.</description>
-    </item>
-    
-    <item>
-      <title>Blog posts</title>
-      <link>/post/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>/post/</guid>
-      <description>Posts Bayesian analysis of a very simple example</description>
     </item>
     
     <item>

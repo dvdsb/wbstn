@@ -1,0 +1,244 @@
+---
+title: Interim analysis for early stopping during the study
+author: ''
+date: '2021-07-29'
+slug: interim-analysis-for-early-stopping-during-the-study
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>This is the second of three posts that address:<br />
+1. Predicting the probability of a “positive” (reject <span class="math inline">\(H_{0}\)</span>) study <em>before</em> running the study<br />
+2. Interim analyses <em>during</em> the study<br />
+3. Evaluating study data in a meaningful way <em>after</em> the study is completed.</p>
+<p>The first post is available <a href="https://davidbock.netlify.app/post/2021/07/27/predicting-the-probability-of-rejecting-h0-before-running-the-study/">here</a>.</p>
+<p>Interim analyses of an ongoing clinical trial enable early stopping due to efficacy or futility. Clinical trials that involve interims data looks are often referred to as <em>group seque
+ntial trials</em>. Interim analyses during the course of the study are sound both from an ethical (do not expose subjects to interventions with uncertain risk/benefit more than necessary) and economic (early stopping may reduce costs) point of view. If the repeated interim analyses are made by a frequentist approach, the outcomes from these analyses are difficult to interpret, e.g. regarding observed p-values. When the analyses are performed by a Bayesian approach this difficulty does not arise and the interpretation of the calculated posterior distribution is straightforward. An in-depth discussion on this topic is beyond the scope of this post but will be addressed in a later post.</p>
+<p>Prof. Frank Harrell published a post on <em>Statistical Design and Analysis Plan for Sequential Parallel-Group RCT for COVID-19</em> <a href="http://hbiostat.org/proj/covid19/bayesplan.html">here</a> where he illustrates by means of simulations how to make interim decisions by continuously updating the posterior distribution of treatment efficacy. To what extent decisions are influenced by different specifications of the prior distributions are demonstrated. The outcome variable is on the ordinal scale. As always, with it comes to Harrell, the work is excellent and very easy to adopt. I have used this work to design a forthcoming RCT of patients with rectal cancer that aims to evaluate different diagnostic tools.</p>
+<p>In this post I will use Harrell´s approach to illustrate how to perform interim analyses on an continuous outcome using the same general linear model as in the previous <a href="https://davidbock.netlify.app/post/2021/07/27/predicting-the-probability-of-rejecting-h0-before-running-the-study/">post</a>. I will both use simulated data real data, using the study data from the <a href="https://www.nejm.org/doi/full/10.1056/nejmoa062249">OPT study</a>.</p>
+<p>See also <a href="https://www.fharrell.com/post/bayes-seq/">here</a></p>
+</div>
+<div id="statistical-model" class="section level1">
+<h1>Statistical model</h1>
+<p>Consider the same general linear model as in the previous post:</p>
+<p><span class="math display">\[\begin{align*} Y_{i}\sim{\sf N}(\tau_{i}, \sigma_{Y})
+\end{align*}\]</span>
+where <span class="math inline">\(\sum\tau=0\)</span>, j=1, 2. The aim is to estimate <span class="math inline">\(\theta=\tau_{2}-\tau_{1}\)</span>. The estimator <span class="math inline">\(\overline{x}_{1} - \overline{x}_{2}\)</span> of <span class="math inline">\(\theta\)</span> is distributed as</p>
+<p><span class="math display">\[\begin{align*}  {\sf N}(\theta,\sqrt{\frac{2\sigma_{Y}^2}{n}} )  
+\end{align*}\]</span>
+where <span class="math inline">\(n\)</span> is the number of observations for each factor level 1 and 2.</p>
+<div id="prior-distribution" class="section level2">
+<h2>Prior distribution</h2>
+<p>When specifying a prior distribution for <span class="math inline">\(\theta\)</span> we adopt Harrell´s approach, i.e. </p>
+<p><span class="math display">\[\begin{align*}  \theta\sim{\sf N}(0, \sigma_{\theta})
+\end{align*}\]</span></p>
+<p>where <span class="math inline">\(\sigma_{\theta}\)</span> is set such that <span class="math inline">\({\sf P}(\theta&gt; 1.75) = {\sf P}(\theta&lt; -1.75) = 0.1\)</span>. This is relatively informative prior as the distribution is rather compressed. We also consider a less informative one where <span class="math inline">\({\sf P}(\theta&gt; 1.75) = {\sf P}(\theta&lt; -1.75) = 0.2\)</span> and finally a more or less flat prior, <span class="math inline">\({\sf P}(\theta&gt; 1.75) = {\sf P}(\theta&lt; -1.75) = 0.45\)</span>.</p>
+<pre class="r"><code>p1&lt;-round(sqrt(((1.75-0)/qnorm(1-0.1))^2), digits=1)
+p2&lt;-round(sqrt(((1.75-0)/qnorm(1-0.2))^2), digits=1)
+p3&lt;-round(sqrt(((1.75-0)/qnorm(1-0.45))^2), digits=1)</code></pre>
+<p>We see that <span class="math inline">\(\sigma_{\theta}\)</span> = 1.4, 2.1 and 13.9 satisfy these specifications. The parameter <span class="math inline">\(\sigma_{Y}\)</span> is for our problem a nuisance parameter and is for simplicity assumed fixed, where we plug in the estimated SD obtain from data at the interim looks. At this stage it could be good to simulate observations from the prior distribution to see if they can give rise to data that are at least reasonable. We will however skip this stage.</p>
+</div>
+</div>
+<div id="gono-go-criteria" class="section level1">
+<h1>Go/No Go criteria</h1>
+<p>At each interim look, declare early stopping due to efficacy if:
+<span class="math display">\[\begin{align*}  {\sf P}(\theta&gt;1|data)&gt;0.9
+\end{align*}\]</span>
+Declare early stopping due to futility/harm if
+<span class="math display">\[\begin{align*}  {\sf P}(\theta&gt;1|data)&lt;0.2
+\end{align*}\]</span>
+Continue otherwise that is
+<span class="math display">\[\begin{align*}  \ 0.2&lt;{\sf P}(\theta&gt;1|data)&lt;0.9
+\end{align*}\]</span></p>
+</div>
+<div id="simulation-experiment" class="section level1">
+<h1>Simulation experiment</h1>
+<p>Consider a two group parallel group design where 84 subjects/group will yield 90% power to detect a true difference of <span class="math inline">\(\theta=\tau_{2}-\tau_{1}\)</span> of 1 (given σ=2). Assume the target number of evaluable number of subjects are 90/group and specify a interim analysis scheme that consists of 15 looks with accumulated number of subjects: (6, 12, 18, …, 90 subjects per group, i.e. a total of 12, 24, 36, …, 180). The number of patients used for analysis is hence cumulative, such that all patients (except for the last 12) contribute at least two times. This is all fine since the bayesian approach relies on the likelihood principle.</p>
+<p>Performing interim looks with this high intensity is often not be feasible in practice for logistic reasons but is used here for illustration. The code below is taken from Harrell´s post and partly changed to the tidyverse framework.</p>
+<p>Note that the simulations below as well as those in Harrell´s post are actually simulations with a single replicate, that is a single dataset is constructed and evaluated for each scenario. A more through evaluation would account for inter-study variability by adding an additional loop around everything. But the current simulations are sufficient for illustration.</p>
+<div id="simulate-data" class="section level2">
+<h2>Simulate data</h2>
+<pre class="r"><code># Specifications
+LKS &lt;- 15   # Number of looks
+N  &lt;- 12*LKS    # Number of subjects
+last_N &lt;- N +1
+scenarios=6   # Number of different true effects considered
+theta     &lt;- c(0, 1/2, 1, 3/2, 2, 5/2)   # true mean difference to consider
+library(tidyverse)
+# Simulate data
+set.seed(512)
+DATA &lt;- tibble( subj=rep(seq(1:N), times=scenarios), 
+                scenario=sort(rep(theta, times = N)), 
+                X=rep(c(0, 1), times = N*scenarios/2),
+                my = X*scenario, 
+                Y = rnorm(N*scenarios, mean=my, sd=2), 
+                Group=factor(X, labels=c(&quot;Control&quot;, &quot;Test&quot;)), 
+                lks = rep(sort(rep(seq(1:LKS), times=N/LKS)), times=scenarios), 
+                lksrev = (LKS+1)+desc(lks)) %&gt;%
+                dplyr::select(subj, scenario, Group, Y, lksrev)
+
+# Group the patients into the different sets being analysed at each interim look. 
+DATA2 &lt;- DATA %&gt;%
+        group_by(scenario) %&gt;%
+        uncount(lksrev) %&gt;%
+        group_by(scenario, subj) %&gt;%
+        mutate(lks = (LKS+1)+desc(row_number()))
+# Calculate the sufficient statistics at each interim look
+DATA3 &lt;- DATA2 %&gt;%
+        group_by(scenario, Group, lks) %&gt;%
+        mutate(lks_group=row_number()) %&gt;%
+        group_by(scenario,  lks, Group) %&gt;%
+        summarise(Mean =mean(Y), sd=sd(Y), n=n()) %&gt;% 
+        mutate(Previous = lag(Mean), 
+                Mean_diff = Mean - Previous, 
+                 SE = sqrt(2/n)*sd)
+# Difference in means and it´s Standard errors 
+#(to use in the calculation of the posterior probability)
+DATA4 &lt;- DATA3 %&gt;%
+        filter(Group == &quot;Test&quot;)</code></pre>
+<p>In the graph we see the estimated averages and 2*SE bars for the different interim looks. The SE´s gradually decrease with the accumulation of data.</p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-4-1.png" width="576" /></p>
+</div>
+<div id="calculate-the-posterior-probabilities" class="section level2">
+<h2>Calculate the posterior probabilities</h2>
+<pre class="r"><code>library(Hmisc)
+# The three priors for theta, with different tail probabilities
+ptails &lt;- c(0.1, 0.2, 0.45)
+
+PostProbs &lt;- DATA4 %&gt;% 
+            expand_grid(ptails) %&gt;%
+          mutate(  
+            # Posterior mean and SD for theta
+            p_m = as.numeric(gbayes(mean.prior = 0, 
+                   stat = Mean_diff, var.stat = SE^2, 
+                   cut.prior=1.75, cut.prob.prior=ptails)[[3]]),
+            p_s = sqrt(as.numeric(gbayes(mean.prior = 0, 
+                   stat = Mean_diff, var.stat = SE^2, 
+                   cut.prior=1.75, cut.prob.prior=ptails)[[4]])),
+            # Posterior probability that theta &gt; 1
+                   PoPr = pnorm(1, mean=p_m, sd=p_s, lower.tail=FALSE), 
+            # Decisions
+          Efficacy = if_else(PoPr &gt; 0.9, -1, 0),
+          Futility = if_else(PoPr &lt; 0.2, -1, 0),          
+          Continue = if_else(PoPr &gt; 0.2 &amp; PoPr &lt;= 0.9, -1, 0) )
+#____________________________________________________________________________________
+# Check when the decisions occur: 
+CHK &lt;- function(vrbl, vle)  {
+  dat &lt;-  tibble(Var = vrbl ,
+                 PoPr = vle,
+                 Scenario=PostProbs$scenario,
+                 look=PostProbs$lks,
+                 ptails=PostProbs$ptails) %&gt;%
+    group_by(Scenario, ptails) %&gt;%
+    arrange(Scenario, ptails, Var)  %&gt;%
+    slice_head( ) %&gt;%
+    mutate( time = case_when(Var==-1 ~ look , Var ==0 ~ 999 ))
+        }
+#________________________________________________________________________________________
+# When does early stop due to efficacy occur? 
+Efficacy &lt;- CHK( PostProbs$Efficacy , PostProbs$PoPr) %&gt;%
+      mutate(t_Eff = time) %&gt;%
+      dplyr::select(Scenario, ptails,  t_Eff, PoPr)
+# When does early stop due to futility occur? 
+Futility &lt;- CHK( PostProbs$Futility , PostProbs$PoPr) %&gt;%
+      mutate(t_Fut = time) %&gt;%
+      dplyr::select(Scenario, ptails,  t_Fut, PoPr)  
+
+EfFu &lt;- Efficacy %&gt;%
+          full_join(Futility) %&gt;%
+          mutate(t_Eff = replace_na(t_Eff, 999) ,
+                 t_Fut = replace_na(t_Fut, 999))
+
+#______________________________________________________________________________
+# Document final decision (Efficacy or futility or &quot;inconclusive&quot; (look 15) and at which time point
+EfFu2 &lt;- EfFu  %&gt;%
+   mutate( Final_d = case_when(t_Eff!=999 &amp; t_Fut==999~3 ,
+                               t_Eff==999 &amp; t_Fut!=999~1,
+                               t_Eff==999 &amp; t_Fut==999~2),
+          look_final_d = case_when(Final_d==1~t_Fut,
+                                   Final_d==3~t_Eff,
+                                   Final_d==2~LKS+1))       # LKS was number of looks, 15
+EfFu2$Final_d &lt;- ordered( EfFu2$Final_d ,
+                           levels = c(1,2, 3),
+                           labels = c(&quot;Negative&quot;, &quot;Inconclusive&quot;,  &quot;Positive&quot;))
+# Some final data wrangling
+EfFu3 &lt;- EfFu2 %&gt;%
+          group_by(Scenario, ptails) %&gt;%
+          summarise(tmin=min(look_final_d)) %&gt;%
+          ungroup()
+    
+EfFu4 &lt;- full_join(EfFu2, EfFu3) %&gt;%  
+          mutate(chose = if_else(tmin==look_final_d, 1, 0), 
+                 TrueDiff = paste0(&quot;True effect: &quot;, Scenario),
+                 Prior = paste0(&quot;P(theta&gt;1.75): &quot;, ptails), 
+                 DT = paste0(Final_d, &quot; &quot;, look_final_d)) %&gt;%
+                 filter(chose==1)  %&gt;%
+                ungroup() %&gt;%
+                  dplyr::select(TrueDiff, DT, Prior) %&gt;%
+  pivot_wider(names_from=Prior, values_from=DT) %&gt;%
+        arrange(TrueDiff)
+#____________________________________________________________________________________
+ U &lt;- PostProbs %&gt;% 
+            mutate(ptails = factor(ptails),
+                   TrueDiff = paste0(&quot;True effect:&quot;,scenario))
+Fig2&lt;-  ggplot(U, aes(x=lks, y=PoPr, color=ptails))+
+   geom_line() +
+   facet_wrap(~ TrueDiff) +
+   theme_bw() +
+   geom_hline(yintercept=c(0.2, 0.9), linetype=&quot;dashed&quot;,
+             color = &quot;grey40&quot;, size=0.5) +
+   theme(legend.position=&quot;bottom&quot;)
+
+Fig2&lt;-Fig2 +  guides(color=guide_legend(title=&quot;Prior P(theta&gt;1.75)&quot;))</code></pre>
+<p>The larger the true effect is the more likely it is of an early stopping for efficacy and hence a “<em>positive</em>” study. When the true effect is 1 the final decision after the 15th look (here referred to as 16) is inconclusive. The reason is that the initial sample size was of the traditional type that doesn´t account for the uncertainty about <span class="math inline">\(\theta\)</span>. In the documentation (p. 132) for the [Hmisc] (<a href="https://cran.r-project.org/web/packages/Hmisc/Hmisc.pdf" class="uri">https://cran.r-project.org/web/packages/Hmisc/Hmisc.pdf</a>) package Harrell illustrates sample calculations where uncertainty about <span class="math inline">\(\theta\)</span> is considered. The approach is closely related to the Assurance calculation in my previous post. Furthermore, this also highlights the recurring criticism that clinical trials often are too small.</p>
+<pre class="r"><code>EfFu4</code></pre>
+<pre><code>## # A tibble: 6 x 4
+##   TrueDiff         `P(theta&gt;1.75): 0.1` `P(theta&gt;1.75): 0.~ `P(theta&gt;1.75): 0.4~
+##   &lt;chr&gt;            &lt;chr&gt;                &lt;chr&gt;               &lt;chr&gt;               
+## 1 True effect: 0   Negative 5           Negative 5          Negative 5          
+## 2 True effect: 0.5 Negative 3           Negative 4          Negative 4          
+## 3 True effect: 1   Inconclusive 16      Inconclusive 16     Inconclusive 16     
+## 4 True effect: 1.5 Positive 7           Positive 6          Positive 5          
+## 5 True effect: 2   Positive 6           Positive 6          Positive 5          
+## 6 True effect: 2.5 Positive 1           Positive 1          Positive 1</code></pre>
+<p>In the graph the posterior probabilities for efficacy, <span class="math inline">\({\sf P}(\theta&gt;1|data)\)</span> are plotted. Note that the probability is relatively robust to specification of the prior and the more data that is accumulated, the differences diminsh further. You can see that the probability is smallest for the prior <span class="math inline">\({\sf P}(\theta&gt; 1.75) = 0.1\)</span> since it impose the largest degree of shrinkage.</p>
+<pre class="r"><code>Fig2</code></pre>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+</div>
+</div>
+<div id="opt-study" class="section level1">
+<h1>OPT study</h1>
+<p>Maternal periodontal disease has been associated with an increased risk of preterm birth and low birth weight. The <a href="https://www.nejm.org/doi/full/10.1056/nejmoa062249">OPT study</a> is a randomized controlled trial aiming at assessing if treating the paradontitis during the pregnance can decrease the risk for preterm birth and low birth weight. Women with paradontitis was randomized to receive treatment either during (treatment) or after pregnancy (control). Sample size is 413 and 410 patients in the treatment and control group, respectively.</p>
+<p>The primary aim here is to re-analyse the data by the approach presented in the previous section with the outcome <em>birth weight</em> (g). The data will be analysed on the log scale and presented as geometric mean ratio, such that treatment effect can be interpreted on the percentage scale that is <span class="math inline">\(\theta=\tau_{2}/\tau_{1}\)</span>. Number of looks will be 20 looks that is an interim analysis scheme that consists of 20 looks with the approximate accumulated number of subjects: (21, 42, 63, …, 410 subjects per group, i.e. a total of 42, 82, 124, …, 820). (we remove the last three subjects (subj 821, 822 and 823) for simplicity).</p>
+<div id="prior-distribution-1" class="section level2">
+<h2>Prior distribution</h2>
+<p>Use a relatively flat prior with <span class="math inline">\({\sf P}(\theta&gt;1.20)=0.45\)</span>, that is the probability that the effect is at least 20% increase in birth weight is 0.45. This would suggest an unrealistically large treatment effect prior but is used to get the prior really flat.</p>
+<p>This prior is achived with <span class="math inline">\(\sigma_{log\theta}\)</span> = 1.5.</p>
+</div>
+</div>
+<div id="gono-go-criteria-1" class="section level1">
+<h1>Go/No Go criteria</h1>
+<p>At each interim look, declare early stopping due to efficacy if:
+<span class="math display">\[\begin{align*}  {\sf P}(\theta&gt;1.10|data)&gt;0.9
+\end{align*}\]</span>
+Declare early stopping due to futility/harm if
+<span class="math display">\[\begin{align*}  {\sf P}(\theta&gt;1.10|data)&lt;0.2
+\end{align*}\]</span>
+Continue otherwise that is
+<span class="math display">\[\begin{align*}  \ 0.2&lt;{\sf P}(\theta&gt;1.10|data)&lt;0.9
+\end{align*}\]</span></p>
+<div id="data-analysis" class="section level2">
+<h2>Data analysis</h2>
+<p>Data is available <a href="https://www.causeweb.org/tshs/obstetrics-and-periodontal-therapy/">here</a>. I was not able to find inclusion date, so I assume patients were recruited in the order they appear in the data set.</p>
+<p>In the graph we see the estimated average (geometric mean) birth weight and 2*SE bars for the different interim looks.</p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-10-1.png" width="576" /></p>
+</div>
+<div id="calculation-of-posterior-probability" class="section level2">
+<h2>Calculation of posterior probability</h2>
+<p>The posterior probability of efficacy (as defined here) is extremely small and with the current efficacy criteria the study should be stopped early due to futility (lack of efficacy)</p>
+<p><img src="{{< blogdown/postref >}}index_files/figure-html/unnamed-chunk-11-1.png" width="576" /></p>
+</div>
+</div>

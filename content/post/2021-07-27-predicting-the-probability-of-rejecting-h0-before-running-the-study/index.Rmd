@@ -1,10 +1,9 @@
 ---
 title: Predicting the probability of rejecting H0 before running the study
-author: dvdsb
+author: ''
 date: '2021-07-27'
 slug: predicting-the-probability-of-rejecting-h0-before-running-the-study
 ---
-
 
 # Introduction                    
 This is the first of three posts that address:                    
