@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <html lang="en-us">
   <head>
+	<meta name="generator" content="Hugo 0.86.0" />
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Posts | A minimal Hugo website</title>
+    <title>Home | A minimal Hugo website</title>
     <link rel="stylesheet" href="/css/style.css" />
     <link rel="stylesheet" href="/css/fonts.css" />
     
@@ -27,24 +28,31 @@
 
 
 
-<h1>Posts</h1>
 
-
+<h2 id="david-bock-phd-associate-professor">David Bock, PhD, Associate professor</h2>
+<img src="/./_index_files/Jag3.JPG" alt="_" width="200px" height="200px"/>
+<p>I´m a biostatistician and associate professor of epidemiology with more than 15 years of postgraduate experience in various roles both within academia and the pharmaceutical industry.</p>
+<p>My primary focus is to contribute to the increasing knowledge on how to improve clinical decision making. I mainly work with scientific questions related to the surgical treatment of patients diagnosed with cancer.</p>
+<p>Main interests:</p>
+<ul>
+<li>Causal inference</li>
+<li>Clinical trial design and analysis</li>
+<li>Bayesian statistics</li>
+<li>Clinical prediction models</li>
+<li>Philosophy of science in general</li>
+</ul>
+<p>I am affiliated to:</p>
+<ul>
+<li><a href="https://www.gu.se/en/medicine/about-us/school-of-public-health-and-community-medicine">School of Public Health and Community Medicine</a>, Institute of Medicine, Goteborg University]</li>
+<li>Scandinavian Surgical Outcomes Research Group (<a href="http://www.ssorg.net/">SSORG</a>), Sahlgrenska University Hospital</li>
+</ul>
+<p>I can be reached by <a href="mailto:david.bock@gu.se">david.bock@gu.se</a></p>
+<h3 id="_blog-posts_"><em>Blog posts</em></h3>
 
 
 <ul>
   
   
-  
-  <li>
-    <span class="date">2021/08/08</span>
-    <a href="/post/2021/08/08/evaluating-study-data-in-a-meaningful-way-after-the-study-is-completed/">Evaluating study data in a meaningful way after the study is completed</a>
-  </li>
-  
-  <li>
-    <span class="date">2021/07/29</span>
-    <a href="/post/2021/07/29/interim-analysis-for-early-stopping-during-the-study/">Interim analysis for early stopping during the study</a>
-  </li>
   
   <li>
     <span class="date">2021/07/27</span>

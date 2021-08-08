@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Statistical consultancy | A minimal Hugo website</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/cv/">Brief CV</a></li>
+      
+      <li><a href="/post/">Posts</a></li>
+      
+      <li><a href="/statistical_consultancy/">Statistical consultancy</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Statistical consultancy</span></h1>
+
+
+</div>
+
+<main>
+<img src="/./statistical_consultancy_files/påmig3.JPG" alt="_" width="250px" height="300px"/>
+<p>I have a broad experience ranging from pharmaceutical drug development to design and analysis of epidemiological studies and prediction models.</p>
+<p>I undertake statistical consulting assignments.                                         <br>
+For example:</p>
+<ul>
+<li>Courses/workshops/teaching</li>
+<li>Study design                                    <br>
+&ndash;	Sample size calculation                      <br>
+&ndash;	Study protocol input                        <br>
+&ndash;	Probability of success</li>
+<li>Statistical Analysis Plan</li>
+<li>Research manuscript input</li>
+<li>Data monitoring committee</li>
+<li>Prediction models</li>
+<li>Bayesian analysis</li>
+<li>Go/No Go criteria</li>
+</ul>
+<p>If interested, please contact me at:                                      <br>
+<a href="mailto:davidbock76@gmail.com">davidbock76@gmail.com</a></p>
+<p>Testimonials are available.</p>
+<p>I do consultancy work for organizations/companies outside Goteborg University. Research affiliated to Goteborg University in need of statistical support are encouraged to contact Akademistatistik at: 
+<a href="mailto:akademistatistik@gu.se">akademistatistik@gu.se</a></p>
+
+</main>
+
+  <footer>
+  <script src="//yihui.org/js/math-code.js"></script>
+<script async src="//mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+<script async src="//yihui.org/js/center-img.js"></script>
+
+  
+  <hr/>
+  © David Bock | <a href="https://github.com/dvdsb">Github</a> | <a href="https://twitter.com/DavidBo28287340">Twitter</a> | <a href="https://www.linkedin.com/in/david-bock-41a41b8/">LinkedIn</a>
+  
+  </footer>
+  </body>
+</html>
+

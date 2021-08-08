@@ -6,36 +6,7 @@
     <description>Recent content in Home on A minimal Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 08 Aug 2021 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
-    <item>
-      <title>Evaluating study data in a meaningful way after the study is completed</title>
-      <link>/post/2021/08/08/evaluating-study-data-in-a-meaningful-way-after-the-study-is-completed/</link>
-      <pubDate>Sun, 08 Aug 2021 00:00:00 +0000</pubDate>
-      
-      <guid>/post/2021/08/08/evaluating-study-data-in-a-meaningful-way-after-the-study-is-completed/</guid>
-      <description>IntroductionThis is the third of three posts that address:
-1. Predicting the probability of a “positive” (reject \(H_{0}\)) study before running the study
-2. Interim analyses during the study
-3. Evaluating study data in a meaningful way after the study is completed.
-The first post is available here and the second is available here.
-Consider the same general linear model as in the previous two posts:
-\[\begin{align*} Y_{i}\sim{\sf N}(\tau_{i}, \sigma_{Y})\end{align*}\]where \(\sum\tau=0\), j=1, 2.</description>
-    </item>
-    
-    <item>
-      <title>Interim analysis for early stopping during the study</title>
-      <link>/post/2021/07/29/interim-analysis-for-early-stopping-during-the-study/</link>
-      <pubDate>Thu, 29 Jul 2021 00:00:00 +0000</pubDate>
-      
-      <guid>/post/2021/07/29/interim-analysis-for-early-stopping-during-the-study/</guid>
-      <description>IntroductionThis is the second of three posts that address:
-1. Predicting the probability of a “positive” (reject \(H_{0}\)) study before running the study
-2. Interim analyses during the study
-3. Evaluating study data in a meaningful way after the study is completed.
-The first post is available here.
-Interim analyses of an ongoing clinical trial enable early stopping due to efficacy or futility. Clinical trials that involve interims data looks are often referred to as group sequential trials.</description>
-    </item>
-    
+    <lastBuildDate>Tue, 27 Jul 2021 00:00:00 +0000</lastBuildDate><atom:link href="/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Predicting the probability of rejecting H0 before running the study</title>
       <link>/post/2021/07/27/predicting-the-probability-of-rejecting-h0-before-running-the-study/</link>
@@ -76,10 +47,7 @@ DAT &amp;lt;- tibble(N = 60 , X = rbinom(N, 1, 0.5),Y = 0.5*X + rnorm(N)) %&amp
       <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
       
       <guid>/post/</guid>
-      <description>Posts Evaluating study data in a meaningful way after the study is completed
-Interim analysis for early stopping during the study
-Predicting the probability of rejecting H0 before running the study
-Bayesian analysis of a very simple example</description>
+      <description>Posts Bayesian analysis of a very simple example</description>
     </item>
     
     <item>
