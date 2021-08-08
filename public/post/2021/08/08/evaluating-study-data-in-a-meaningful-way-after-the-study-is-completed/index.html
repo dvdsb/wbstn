@@ -55,8 +55,8 @@ The usual way to report the results from a statistical analysis of data from a f
 <p><em>GO</em> if <span class="math inline">\(P^{20}_{\hat{\theta}}\)</span>&gt;LRV and <span class="math inline">\(P^{90}_{\hat{\theta}}\)</span>&gt;TV<br />
 <em>PAUSE</em> if <span class="math inline">\(P^{20}_{\hat{\theta}}\le\)</span>LRV and <span class="math inline">\(P^{90}_{\hat{\theta}}\)</span>&gt;TV<br />
 <em>STOP</em> if <span class="math inline">\(P^{90}_{\hat{\theta}}\le\)</span>TV</p>
-<p>The three scenarios are illustrated in the figure.</p>
-<p><img src="/post/2021/08/08/evaluating-study-data-in-a-meaningful-way-after-the-study-is-completed/index_files/figure-html/unnamed-chunk-1-1.png" width="576" /></p>
+<p>The three scenarios are illustrated in the figure.<br />
+<img src="/post/2021/08/08/evaluating-study-data-in-a-meaningful-way-after-the-study-is-completed/index_files/figure-html/unnamed-chunk-1-1.png" width="576" /></p>
 <p>Let´s simulate 1000 trial results based on 63 subjects/group, respectively, where <span class="math inline">\(\sigma\)</span>=2 and <span class="math inline">\(\theta=\)</span> 0.25, 0.50, 0.75, 1.0 and 1.25, respectively. Set LRV=0.75 and TV=1.25.</p>
 <pre class="r"><code>library(tidyverse)
 # Specifications for the simulations
@@ -164,7 +164,7 @@ fig2 &lt;- ggplot(OUT_21, aes(x=theta, y=Percent, fill=DECISION)) +
 <div id="bayesian-analysis" class="section level2">
 <h2>Bayesian analysis</h2>
 <p>When we have a single study it is convenient to use the whole posterior distribution to support decision making. Frank Harrell suggest a great of visualisation <a href="https://www.youtube.com/watch?v=RUAMMIACoSo&amp;t=2641s&amp;ab_channel=NISSCommunications">here</a>.</p>
-<p>This plot can can give you information on for example {P}(<span class="math inline">\(\theta\)</span>&gt;TV|data) that is information that is highly relevant for decision making. This is the area to the right of the TV-line in the figure below. We see that for TV=1.25, {P}(<span class="math inline">\(\theta\)</span>&gt;TV|data) is relatively small for all true values of <span class="math inline">\(\theta\)</span>. This is again due to the aggressive shrinkage of out prior.</p>
+<p>This plot can can give you information on for example P(<span class="math inline">\(\theta\)</span>&gt;TV|data) that is information that is highly relevant for decision making. This is the area to the right of the TV-line in the figure below. We see that for TV=1.25, P(<span class="math inline">\(\theta\)</span>&gt;TV|data) is relatively small for all true values of <span class="math inline">\(\theta\)</span>. This is again due to the aggressive shrinkage of out prior.</p>
 <table>
 <thead>
 <tr class="header">

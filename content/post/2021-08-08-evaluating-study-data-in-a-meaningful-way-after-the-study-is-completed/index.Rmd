@@ -5,6 +5,13 @@ date: '2021-08-08'
 slug: evaluating-study-data-in-a-meaningful-way-after-the-study-is-completed
 ---
 
+---
+title: "R Notebook"
+output:
+  html_document:
+    df_print: paged
+---
+
 
 # Introduction                
 
@@ -31,8 +38,7 @@ The usual way to report the results from a statistical analysis of data from a f
 *PAUSE* if $P^{20}_{\hat{\theta}}\le$LRV and $P^{90}_{\hat{\theta}}$>TV                       
 *STOP* if $P^{90}_{\hat{\theta}}\le$TV                
 
-The three scenarios are illustrated in the figure.                 
-
+The three scenarios are illustrated in the figure.                                     
 ```{r, echo=FALSE, results='hide' , message=FALSE, warning=FALSE, fig.width=6, fig.height=4, fig.fullwidth=TRUE}
 plot(1, lwd=0,axes=F,xlab="",ylab="", type = "l")
 lines(c(0.8, 0.8), c(-1, 2), type = "l", lty=2)
@@ -46,7 +52,7 @@ text(0.6, 1.2, "GO", cex = 1.2, pos = 4, col="darkgreen")
 text(0.6, 1.0, "PAUSE", cex = 1.2, pos=4, col="orange")
 text(0.6, 0.8, "STOP", cex = 1.2, pos=4, col="red")
 ```
-   
+        
 Let´s simulate 1000 trial results based on 63 subjects/group, respectively, where $\sigma$=2 and $\theta=$ 0.25, 0.50, 0.75, 1.0 and 1.25, respectively. Set LRV=0.75 and TV=1.25.
 
 ```{r,  results='hide' , message=FALSE, warning=FALSE, fig.show='hide'}
@@ -285,7 +291,7 @@ S_2x <- S_2 %>%
 
 ```
 
-This plot can can give you information on for example {\sf P}($\theta$>TV|data) that is information that is highly relevant for decision making. This is the area to the right of the TV-line in the figure below. We see that for TV=1.25, {\sf P}($\theta$>TV|data) is relatively small for all true values of $\theta$. This is again due to the aggressive shrinkage of out prior. 
+This plot can can give you information on for example P($\theta$>TV|data) that is information that is highly relevant for decision making. This is the area to the right of the TV-line in the figure below. We see that for TV=1.25, P($\theta$>TV|data) is relatively small for all true values of $\theta$. This is again due to the aggressive shrinkage of out prior. 
 ```{r, echo=FALSE, message=FALSE, warning=FALSE}
 knitr::kable(S_2x , format='pipe')
 ```
