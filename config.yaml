@@ -15,15 +15,9 @@ menu:
     - name: Home
       url: ""
       weight: 1
-    - name: Brief CV
-      url: "cv/"
-      weight: 2
     - name: Posts
       url: "post/"
-      weight: 3
-    - name: Statistical consultancy
-      url: "statistical_consultancy/"
-      weight: 4
+      weight: 2
 
 params:
   description: "A website built through Hugo and blogdown."
