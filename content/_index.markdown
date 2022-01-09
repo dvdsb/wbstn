@@ -28,6 +28,8 @@ Statistical Science Associate Director at AstraZeneca, Sweden
 
 I can be reached by davidbock76@gmail.com
 
+My CV is available here [PDF](/media/CV_220108.pdf).
+
 
 ### _Blog posts_
 
