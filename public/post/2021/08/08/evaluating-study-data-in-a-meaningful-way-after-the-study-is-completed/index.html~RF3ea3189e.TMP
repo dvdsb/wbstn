@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en-us">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Evaluating study data in a meaningful way after the study is completed | A minimal Hugo website</title>
+    <link rel="stylesheet" href="/css/style.css" />
+    <link rel="stylesheet" href="/css/fonts.css" />
+    
+  </head>
+
+  <body>
+    <nav>
+    <ul class="menu">
+      
+      <li><a href="/">Home</a></li>
+      
+      <li><a href="/cv/">Brief CV</a></li>
+      
+      <li><a href="/post/">Posts</a></li>
+      
+      <li><a href="/statistical_consultancy/">Statistical consultancy</a></li>
+      
+    </ul>
+    <hr/>
+    </nav>
+
+<div class="article-meta">
+<h1><span class="title">Evaluating study data in a meaningful way after the study is completed</span></h1>
+
+<h2 class="date">2021/08/08</h2>
+</div>
+
+<main>
+
+<script src="/post/2021/08/08/evaluating-study-data-in-a-meaningful-way-after-the-study-is-completed/index_files/header-attrs/header-attrs.js"></script>
+
+
+<div id="introduction" class="section level1">
+<h1>Introduction</h1>
+<p>This is the third of three posts that address:<br />
+1. Predicting the probability of a “positive” (reject <span class="math inline">\(H_{0}\)</span>) study <em>before</em> running the study<br />
+2. Interim analyses <em>during</em> the study<br />
+3. Evaluating study data in a meaningful way <em>after</em> the study is completed.</p>
+<p>The first post is available <a href="https://davidbock.netlify.app/post/2021/07/27/predicting-the-probability-of-rejecting-h0-before-running-the-study/">here</a> and the second is available <a href="https://davidbock.netlify.app/post/2021/07/29/interim-analysis-for-early-stopping-during-the-study/">here</a>.</p>
+<p>Consider the same general linear model as in the previous two posts:</p>
+<p><span class="math display">\[\begin{align*} Y_{i}\sim{\sf N}(\tau_{i}, \sigma_{Y})
+\end{align*}\]</span>
+where <span class="math inline">\(\sum\tau=0\)</span>, j=1, 2. The aim is to estimate the treatment effect <span class="math inline">\(\theta=\tau_{2}-\tau_{1}\)</span>.
+The usual way to report the results from a statistical analysis of data from a finalized clinical study is by the estimated treatment effect, <span class="math inline">\(\hat{\theta}\)</span>, 95% confidence interval, and p-values for testing the null hypothesis <span class="math inline">\(H_{0}: \theta=0\)</span>. From a clinical perspective we are interested in an making statements about the “true” treatment effect <span class="math inline">\(\theta\)</span> and whether it fulfills requirements for being clinically meaning that is if <span class="math inline">\(\theta\)</span> is in an interval of values considered to provide a benefit for the patient. Since such statements are made with uncertainty the statements are probabilistic (either in a frequentist or bayesian sense). In this post the interval for <span class="math inline">\(\theta\)</span> implying a clinical meaningful effect will be taken as given and the aim is to illustrera some approaches to address whether the criteria of efficacy are satisfied.</p>
+</div>
+<div id="frequentist-gono-go-criteria" class="section level1">
+<h1>Frequentist Go/No Go criteria</h1>
+<p><a href="https://ascpt.onlinelibrary.wiley.com/doi/10.1038/sj.clpt.6100235">Lalonde <em>et al</em>, 2007</a> construct a frequentist decision rule do be used to determine whether to continue (<em>GO</em>), pause or stop a drug devlopment program according to the following way. First they define two <em>estimands</em>, <span class="math inline">\(P^{20}_{\hat{\theta}}\)</span> and <span class="math inline">\(P^{90}_{\hat{\theta}}\)</span>, the 20th and 90th percentiles of the sampling distribution of <span class="math inline">\(\hat{\theta}\)</span>. Second they define the interval of clinically meaningful values of <span class="math inline">\(\theta\)</span>, where the lower and upper part referred to as LRV and TV, respectively.</p>
+<p><em>GO</em> if <span class="math inline">\(P^{20}_{\hat{\theta}}\)</span>&gt;LRV and <span class="math inline">\(P^{90}_{\hat{\theta}}\)</span>&gt;TV<br />
+<em>PAUSE</em> if <span class="math inline">\(P^{20}_{\hat{\theta}}\le\)</span>LRV and <span class="math inline">\(P^{90}_{\hat{\theta}}\)</span>&gt;TV<br />
+<em>STOP</em> if <span class="math inline">\(P^{90}_{\hat{\theta}}\le\)</span>TV</p>
+<p>The three scenarios are illustrated in the figure.<br />
+<img src="/post/2021/08/08/evaluating-study-data-in-a-meaningful-way-after-the-study-is-completed/index_files/figure-html/unnamed-chunk-1-1.png" width="576" /></p>
+<p>Let´s simulate 1000 trial results based on 63 subjects/group, respectively, where <span class="math inline">\(\sigma\)</span>=2 and <span class="math inline">\(\theta=\)</span> 0.25, 0.50, 0.75, 1.0 and 1.25, respectively. Set LRV=0.75 and TV=1.25.</p>
+<pre class="r"><code>library(tidyverse)
+# Specifications for the simulations
+REP&lt;-1000; 
+sigma&lt;-2
+n1&lt;-63
+LRV&lt;-0.75
+TV&lt;-1.25
+theta. &lt;- c(0.25, 0.5, 0.75, 1, 1.25)
+
+set.seed(123)
+# Simulate data
+DAT &lt;- tibble(i = seq(1:(REP*(length(theta.))*(2*n1)))  ,
+          rep = sort(rep(seq(1:REP), times = (length(theta.))*(2*n1))),
+          theta=rep(theta., times = REP*(2*n1)), 
+          gr=rep(c(rep(0, times=n1), rep(1, times=n1)), times = REP*(length(theta.))),
+          Group = factor(gr, labels = c(&quot;B&quot;, &quot;A&quot;)),
+          N=rep(seq(1:n1), times=2*REP*(length(theta.))), 
+          Y = gr*theta + rnorm((REP*(length(theta.))*(2*n1)), 0, 2)) </code></pre>
+<p>For each true effect and replicate, estimate the percentiles based on assumption of a t-distribution (traditional two-sample confidence interval)</p>
+<pre class="r"><code>OUT_1 &lt;-   DAT %&gt;%
+     group_split(theta, rep ) %&gt;%
+     map(~ lm(Y ~ Group, data = .x)) %&gt;%
+    # The percentiles from the sampling distribution
+  map_df(~ {tibble(LOW = confint(., level = .60)[[2,1]], 
+                   UP = confint(., level = .80)[[2,2]],
+                   coefs = coef(.)[2])})
+      OUT_1 &lt;- OUT_1 %&gt;%
+        mutate(theta=sort(rep(theta., times = REP)), 
+              rep = rep(seq(1:REP), times = length(theta.)), 
+              DECISION = factor(case_when(LOW &gt; LRV &amp; UP &gt; TV ~ 2, 
+                           LOW &lt;= LRV &amp; UP &gt; TV ~ 1, 
+                           UP &lt;= TV ~ 0), labels = c(&quot;Stop&quot;, &quot;Pause&quot;, &quot;Go&quot;)))</code></pre>
+<p>Calculate the percentage of times the different decisions are made and display them in a plot.</p>
+<pre class="r"><code>OUT_2 &lt;- OUT_1 %&gt;% 
+              group_by(theta, DECISION) %&gt;%
+               tally() %&gt;%
+                mutate(Percent = round(100*n/REP, 0 ))
+fig1 &lt;- ggplot(OUT_2, aes(x=theta, y=Percent, fill=DECISION)) +
+        labs(title=&quot;Frequentist Go/No Go&quot;) +
+        geom_bar(stat=&quot;identity&quot;) + 
+        theme_bw() +
+       theme(legend.position=&quot;bottom&quot;) +
+        geom_col(position = position_stack(reverse = TRUE))</code></pre>
+<p>The larger the true effect, the higher the probability of declaring a <em>Go</em>. When the true effect is equal to TV that is 1.25 the chance of <em>GO</em> is still only 75%. The reason is the relatively small sample size. As mentioned in the previous post, clinical trials often are too small. Hence, sizing a study to achieve 80% power is not necessarily reasonable when the aim is something else - here to have satisfactory expected properties of the Go/No Go criteria.</p>
+<p><img src="/post/2021/08/08/evaluating-study-data-in-a-meaningful-way-after-the-study-is-completed/index_files/figure-html/unnamed-chunk-5-1.png" width="576" /></p>
+</div>
+<div id="bayesian-gono-go-criteria" class="section level1">
+<h1>Bayesian Go/No Go criteria</h1>
+<p>Use the same framework, but instead of using the percentiles from the sampling distribution calculate instead a posterior distribution and compare these with LRV and TV. Just as in the previous post,</p>
+<p><span class="math display">\[\begin{align*}  \theta\sim{\sf N}(0, \sigma_{\theta})
+\end{align*}\]</span></p>
+<p>For illustration, we use an <em>extremely</em> informative prior, <span class="math inline">\({\sf P}(\theta&gt; 1.5) = {\sf P}(\theta&lt; -1.5) = 0.05\)</span>. The prior implies <span class="math inline">\(\sigma_{\theta}\)</span> = 0.9 It is not reasonable to use such extreme prior in practice, but we use it here to make differences from the frequentist approach more pronounced (with a highly informative prior, shrinkage will be strong and data will have less influence).</p>
+<pre class="r"><code>library(Hmisc)
+
+OUT_11 &lt;-   DAT %&gt;%
+     group_split(theta, rep ) %&gt;%
+     map(~ lm(Y ~ Group, data = .x)) %&gt;%
+  map_df(~ {tibble(coefs = coef(.)[2], 
+                   SE = sqrt(diag(vcov(.)))[2])})</code></pre>
+<p>The estimate average treatment effect and it´s standard error are the sufficient statistics (conditional on model and sample size). Use these to derive the posterior average and variance. Since this is a so called <em>conjugate analysis</em> the posterior will be a normal distribution.</p>
+<pre class="r"><code>OUT_11 &lt;- OUT_11 %&gt;%
+            # Posterior mean and SD for theta
+  mutate( theta=sort(rep(theta., times = REP)), 
+          rep = rep(seq(1:REP), times = length(theta.)),
+           p_m = as.numeric(gbayes(mean.prior = 0, 
+                   stat = coefs, var.stat = SE^2, 
+                   cut.prior=1.75, cut.prob.prior=0.05)[[3]]),
+            p_s = sqrt(as.numeric(gbayes(mean.prior = 0, 
+                   stat = coefs, var.stat = SE^2, 
+                   cut.prior=1.75, cut.prob.prior=0.05)[[4]])), 
+  # The percentiles from the posterior distribution
+           LOW = qnorm(p=0.2, mean=p_m, sd=p_s),
+           UP = qnorm(p=0.9, mean=p_m, sd=p_s), 
+           DECISION = factor(case_when(LOW &gt; LRV &amp; UP &gt; TV ~ 2, 
+                           LOW &lt;= LRV &amp; UP &gt; TV ~ 1, 
+                           UP &lt;= TV ~ 0), labels = c(&quot;Stop&quot;, &quot;Pause&quot;, &quot;Go&quot;)), 
+          theta=sort(rep(theta., times = REP)), 
+              rep = rep(seq(1:REP), times = length(theta.)) )</code></pre>
+<p>Calculate the percentage of times the different decisions are made and display them in a plot.</p>
+<pre class="r"><code>OUT_21 &lt;- OUT_11 %&gt;% 
+              group_by(theta, DECISION) %&gt;%
+               tally() %&gt;%
+                mutate(Percent = round(100*n/REP, 0 ))
+
+fig2 &lt;- ggplot(OUT_21, aes(x=theta, y=Percent, fill=DECISION)) +
+          labs(title=&quot;Bayesian Go/No Go&quot;) +
+        geom_bar(stat=&quot;identity&quot;) + 
+        theme_bw() +
+        theme(legend.position=&quot;bottom&quot;) +
+        geom_col(position = position_stack(reverse = TRUE))</code></pre>
+<p>The despite we used a highly informative prior, the posterior will be more or less solely driven by data. If you compare the two figures you´ll see that the probability of <em>GO</em> is lower in the bayesian analysis. For example when <span class="math inline">\(\theta\)</span>=1 then probability of <em>GO</em> is 44% and 33% for the frequentist and bayesian approach, respectively, which is due to a strong shrinkage effect of the prior.</p>
+<p><img src="/post/2021/08/08/evaluating-study-data-in-a-meaningful-way-after-the-study-is-completed/index_files/figure-html/unnamed-chunk-10-1.png" width="576" /></p>
+</div>
+<div id="look-at-a-single-study-in-more-detail" class="section level1">
+<h1>Look at a single <em>study</em> in more detail</h1>
+<p>Let us use one of the 1000 simulated studies (but we still allow the true effect to be of different size).</p>
+<p>We see that the signal-to-noise ratio is lower than one might intuitively would expect from a large value of <span class="math inline">\(\theta\)</span>.</p>
+<p><img src="/post/2021/08/08/evaluating-study-data-in-a-meaningful-way-after-the-study-is-completed/index_files/figure-html/unnamed-chunk-12-1.png" width="576" /></p>
+<div id="frequentist-analysis" class="section level2">
+<h2>Frequentist analysis</h2>
+<p>All scenarios result in a <em>STOP</em> except for <span class="math inline">\(\theta\)</span>=1.25 that results in a <em>GO</em>.</p>
+<p><img src="/post/2021/08/08/evaluating-study-data-in-a-meaningful-way-after-the-study-is-completed/index_files/figure-html/unnamed-chunk-15-1.png" width="576" /></p>
+</div>
+<div id="bayesian-analysis" class="section level2">
+<h2>Bayesian analysis</h2>
+<p>When we have a single study it is convenient to use the whole posterior distribution to support decision making. Frank Harrell suggest a great of visualisation <a href="https://www.youtube.com/watch?v=RUAMMIACoSo&amp;t=2641s&amp;ab_channel=NISSCommunications">here</a>.</p>
+<p>This plot can can give you information on for example P(<span class="math inline">\(\theta\)</span>&gt;TV|data) that is information that is highly relevant for decision making. This is the area to the right of the TV-line in the figure below. We see that for TV=1.25, P(<span class="math inline">\(\theta\)</span>&gt;TV|data) is relatively small for all true values of <span class="math inline">\(\theta\)</span>. This is again due to the aggressive shrinkage of out prior.</p>
+<table>
+<thead>
+<tr class="header">
+<th align="right">0.25</th>
+<th align="right">0.5</th>
+<th align="right">0.75</th>
+<th align="right">1</th>
+<th align="right">1.25</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td align="right">0.0027</td>
+<td align="right">0.0024</td>
+<td align="right">0.029</td>
+<td align="right">0.033</td>
+<td align="right">0.4</td>
+</tr>
+</tbody>
+</table>
+<p><img src="/post/2021/08/08/evaluating-study-data-in-a-meaningful-way-after-the-study-is-completed/index_files/figure-html/unnamed-chunk-18-1.png" width="576" /></p>
+</div>
+</div>
+<div id="concluding-remarks" class="section level1">
+<h1>Concluding remarks</h1>
+<p>When I several years ago was introduced to the Lalonde´s concept I was told it was in some sense semi-bayesian. I actually have difficulties to understand the semi-bayesian in the approach since the statistical model is purely frequentist. But the approach is excellent to combine with Bayesian thinking. This has also been done by the book by <a href="https://www.routledge.com/Clinical-Trial-Optimization-Using-R/Dmitrienko-Pulkstenis/p/book/9780367261252">Dmitrienko <em>et al</em></a>. If you have little or skewed data, <span class="math inline">\(P^{20}_{\hat{\theta}}\)</span> and <span class="math inline">\(P^{90}_{\hat{\theta}}\)</span>, can be estimated by bootstrapping technique. But I think it would be even better to use a bayesian approach a combine it with a semi-parametric model such as ordinal regression, as it demonstrated <a href="https://www.fharrell.com/post/po/">here</a>. I have here taken LRV and TV as given and haven´t discussed how how to determine them.</p>
+</div>
+
+</main>
+
+  <footer>
+  <script src="//yihui.org/js/math-code.js"></script>
+<script async src="//mathjax.rstudio.com/latest/MathJax.js?config=TeX-MML-AM_CHTML"></script>
+
+<script async src="//yihui.org/js/center-img.js"></script>
+
+  
+  <hr/>
+  © David Bock | <a href="https://github.com/dvdsb">Github</a> | <a href="https://twitter.com/DavidBo28287340">Twitter</a> | <a href="https://www.linkedin.com/in/david-bock-41a41b8/">LinkedIn</a>
+  
+  </footer>
+  </body>
+</html>
+
