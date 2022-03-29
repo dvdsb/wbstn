@@ -6,7 +6,16 @@
     <description>Recent content in Posts on A minimal Hugo website</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en-us</language>
-    <lastBuildDate>Sun, 08 Aug 2021 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Tue, 29 Mar 2022 00:00:00 +0000</lastBuildDate><atom:link href="/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>How to calculate the posterior distribution</title>
+      <link>/post/2022/03/29/how-to-calculate-the-posterior-distribution/</link>
+      <pubDate>Tue, 29 Mar 2022 00:00:00 +0000</pubDate>
+      
+      <guid>/post/2022/03/29/how-to-calculate-the-posterior-distribution/</guid>
+      <description>Bayesian inferenceWhen we make inference on the parameter \(\theta\) given the observed data y by means of obtaining the posterior distribution \(P(\theta | y)\) from Bayes formula\[P(\theta|y)=\frac{f(y|\theta)\cdot P(\theta)}{f(y)}\]where \(f(y|\theta)\) and \(P(\theta)\) is the likelihood and prior distribution, respectively. The denominator, \(f(y)\) is a normalizing constant,\[f(Y)= \int_{\theta}{f(Y| \theta)\cdot P(\theta)d\theta}\]to enable \(P(\theta | y)\) to be between 0 and 1 (which is required for it to be a probability distribution).</description>
+    </item>
+    
     <item>
       <title>Evaluating study data in a meaningful way after the study is completed</title>
       <link>/post/2021/08/08/evaluating-study-data-in-a-meaningful-way-after-the-study-is-completed/</link>
