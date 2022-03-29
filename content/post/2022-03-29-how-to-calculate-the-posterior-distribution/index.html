@@ -1,0 +1,38 @@
+---
+title: How to calculate the posterior distribution
+author: ''
+date: '2022-03-29'
+slug: how-to-calculate-the-posterior-distribution
+categories: []
+tags: []
+---
+
+<script src="{{< blogdown/postref >}}index_files/header-attrs/header-attrs.js"></script>
+
+
+<div id="bayesian-inference" class="section level2">
+<h2>Bayesian inference</h2>
+<p>When we make inference on the parameter <span class="math inline">\(\theta\)</span> given the observed data <em>y</em> by means of obtaining the posterior distribution <span class="math inline">\(P(\theta | y)\)</span> from Bayes formula
+<span class="math display">\[
+P(\theta|y)=\frac{f(y|\theta)\cdot P(\theta)}{f(y)}
+\]</span>
+where <span class="math inline">\(f(y|\theta)\)</span> and <span class="math inline">\(P(\theta)\)</span> is the likelihood and prior distribution, respectively. The denominator, <span class="math inline">\(f(y)\)</span> is a normalizing constant,
+<span class="math display">\[
+f(Y)= \int_{\theta}{f(Y| \theta)\cdot P(\theta)d\theta}
+\]</span>
+to enable <span class="math inline">\(P(\theta | y)\)</span> to be between 0 and 1 (which is required for it to be a probability distribution). A closed form expression of <span class="math inline">\(P(\theta | y)\)</span> can be achieved when the posterior and prior has the same probability distribution family as the prior probability distribution <span class="math inline">\(P(\theta | y)\)</span>. For example, in an experiment of repeated Bernoulli trials, the likelihood function for the number of “successes” is expressed as a Binomial distribution and then if we use a Beta distribution as a prior distribution for the probability of “success” the resulting posterior distribution will also be the form of a Beta distribution. If we specify the analysis in such a way, it is called a <em>conjugate analysis</em>.</p>
+</div>
+<div id="non-conjugate-analysis-and-complex-experiments" class="section level2">
+<h2>Non-conjugate analysis and complex experiments</h2>
+<p>When we want to use non-conjugate priors for simple problems or when the experiment give rise to complex a likelihood function, for example in study designs with hierarchical structures where <span class="math inline">\(\theta\)</span> is a vector of many parameters, a conjugate analysis can´t be performed and <span class="math inline">\(P(\theta | y)\)</span> can´t be expressed in closed form. The reason is that even though the likelihood function (conditional on <span class="math inline">\(\theta\)</span>) often can be expressed, at least approximately, so that we can compute the value in the numerator (<span class="math inline">\(f(y|\theta)\cdot P(\theta)\)</span>), an analytic solution to the integral <span class="math inline">\(f(y)\)</span> will in general not be possible to obtain.</p>
+<p>If we can´t express <span class="math inline">\(P(\theta | y)\)</span> in closed form, we can try to approximate it empirically, that is drawing values <span class="math inline">\(\theta\)</span> where we want the histogram for <span class="math inline">\(\theta\)</span> to be very similar to <span class="math inline">\(P(\theta | y)\)</span>. The histogram will approximate <span class="math inline">\(P(\theta | y)\)</span> if we select <em>appropriate</em> values of <span class="math inline">\(\theta\)</span> in the simulation. But how can we know which values are appropriate? Markov Chain Monte Carlo (MCMC) is an algorithm that selects values for us so that when enough choices have been made (a few thousand) have been made, the histogram will automatically mimic <span class="math inline">\(P(\theta | y)\)</span>.</p>
+</div>
+<div id="markov-chain-monte-carlo-mcmc" class="section level2">
+<h2>Markov Chain Monte Carlo (MCMC)</h2>
+<p>How does MCMC select values of <span class="math inline">\(\theta\)</span>? I had a hard time to get an intuitive feeling of how MCMC, at least in principle, works. We want to select values of <span class="math inline">\(\theta\)</span> but for some values of <span class="math inline">\(\theta\)</span> we want to choose the same value many times and for some values we want to choose the same value a few times (we want the number of times we choose specific values of <span class="math inline">\(\theta\)</span> to be in approximately the same proportion as the probability <span class="math inline">\(P(\theta | y)\)</span>.
+The criterion for which value of <span class="math inline">\(\theta\)</span> one chooses depends on the value of the numerator <span class="math inline">\(f(y|\theta)\cdot P(\theta)\)</span> for a randomly proposed value of <span class="math inline">\(\theta\)</span> which is a potential candidate to be elected. If this product has a larger value than the previous proposal, we choose θ. If the product has a smaller value, we discard the new value and select the previous value again. Since <span class="math inline">\(f(y|\theta)\cdot P(\theta)\)</span> has the same shape as <span class="math inline">\(P(\theta | y)\)</span>, if we do this thousands of times, we will have chosen different values of <span class="math inline">\(\theta\)</span> different many times. The histogram of these values will approximate <span class="math inline">\(P(\theta | y)\)</span>.</p>
+<p>This is my intuitive feeling of how it in principle works. Of course, things can´t be that simple for such a extremely complex thing as sampling from a distribution that you don´t know anything of (and doesn´t exist physically) and a lot of work has been devoted to improve how the MCMC operates. Algorithms have been developed to improve the chain in terms of faster computations and smarter proposals, for example in order to avoid the markov chain to be stuck (or avoid) local domains of the parameter space, such as local maxima or minima in multimodal distributions. This is described in Richard McElreath´s book <a href="https://xcelab.net/rm/statistical-rethinking/">Statistical Rethinking</a> (see also the videos lecture <a href="https://youtu.be/Qqz5AJjyugM">here</a>). For instance, Hamiltonian Monte Carlo (HMC) algorithm do the MCMC much smarter than earlier ones based on Gibbs sampling and the Metropolis algorithm. <a href="https://mc-stan.org/">Stan</a> uses HMC and its adaptive variant the No-U-Turn Sampler (NUTS). The animation below illustrates how Hamiltonian Monte Carlo picks parameter values. For animations are available <a href="http://chi-feng.github.io/mcmc-demo/">here</a>.</p>
+<iframe src="http://chi-feng.github.io/mcmc-demo/app.html?algorithm=HamiltonianMC&amp;target=banana" width="672" height="400px" data-external="1">
+</iframe>
+<p>As an applied Bayesian I have personally no ambition to be an expert on MCMC but I think at least some intuitive understanding of it is important to have. What is does is very fascinating: It helps you approximate something unknown that in fact doesn’t exist in the physical world (a probability distribution only have a physical meaning in the frequentist framework). Besides McElreath´s book I can recommend <a href="https://youtu.be/a-wydhEuAm0">this</a> video as well.</p>
+</div>
